@@ -7,6 +7,7 @@ import {
   createProduct,
 } from './index';
 
+import productsError from './utils/products';
 import fetch from 'node-fetch';
 import { mocked } from 'ts-jest/utils';
 
@@ -28,6 +29,7 @@ describe('isInteger function', () => {
     expect(isInteger('abc')).toBe(false);
     expect(isInteger(null)).toBe(false);
     expect(isInteger(undefined)).toBe(false);
+    //ERROR CASE
     // expect(isInteger(123!)).toBe(false);
   });
 });
@@ -48,14 +50,31 @@ describe('toLowerCase function', () => {
 
 describe('removeDuplicatesFromArray function', () => {
   test('return array without duplicates', () => {
-    const arrayNumber = [123, 234, 345, 456, 321, 432, 543, 321, 432];
-    const arrayNonNumber = [123!, '*123*', '$123', 123, 123!, '$123'];
+    const arrayNumber = [2004, 2008, 2012, 2021, 2012];
+    const arrayNoNumber = [
+      123,
+      234,
+      undefined,
+      234,
+      123,
+      null,
+      null,
+      undefined,
+    ];
     const arrayString = ['Maki', 'kira', 'MAKI', 'rayo', 'fido', 'kira'];
     const arraySingle = ['one'];
+
     expect(removeDuplicatesFromArray(arrayNumber)).toEqual([
-      123, 234, 345, 456, 321, 432, 543,
+      2004, 2008, 2012, 2021,
     ]);
-    // expect(removeDuplicatesFromArray(arrayNonNumber)).toEqual([123!,'*123*', '$123', 123])
+
+    expect(removeDuplicatesFromArray(arrayNoNumber)).toEqual([
+      123,
+      234,
+      undefined,
+      null,
+    ]);
+
     expect(removeDuplicatesFromArray(arrayString)).toEqual([
       'Maki',
       'kira',
@@ -63,6 +82,7 @@ describe('removeDuplicatesFromArray function', () => {
       'rayo',
       'fido',
     ]);
+
     expect(removeDuplicatesFromArray(arraySingle)).toEqual(arraySingle);
   });
 
@@ -75,14 +95,15 @@ describe('removeDuplicatesFromArray function', () => {
 describe('createRandomProduct function', () => {
   test('disallowed to create a random product, not have the permissions', () => {
     expect(() => createRandomProduct('diana@themyscira.com')).toThrow(
-      `You are not allowed to create products`,
+      'You are not allowed to create products',
     );
     expect(() => createRandomProduct('bruce@wayne.com')).toThrow(
-      `You are not allowed to create products`,
+      'You are not allowed to create products',
     );
   });
 
   test('allowed to create a random product', () => {
+    //ERROR CASE
     // expect(createRandomProduct('clark@kent.com')).toEqual({
     //   id: expect.any(Number),
     //   name: expect.any(String),
@@ -101,7 +122,7 @@ describe('createRandomProduct function', () => {
   });
 });
 
-describe('createRandomProduct function', () => {
+describe('createProduct function', () => {
   test('create a valid product', () => {
     const product = {
       name: 'Brown',
@@ -116,21 +137,16 @@ describe('createRandomProduct function', () => {
     });
   });
 
-  test('create an invalid product', () => {
-    const product = {
-      name: 'Brown Eggs',
-      tags: ['dairy'],
-      description: 'Raw organic brown eggs',
-      price: 28.1,
-    };
-
-    expect(() => createProduct(product)).toThrow();
+  productsError.forEach((product) => {
+    test(`invalid ${JSON.stringify(product.name)}`, () => {
+      expect(() => createProduct(product)).toThrow(Error);
+    });
   });
 });
 
 describe('getStarWarsPlanets function', () => {
   test('get planets with fetch', async () => {
-    // provide a mock implementation for the mocked fetch:
+
     mocked(fetch).mockImplementation((): Promise<any> => {
       return Promise.resolve({
         json() {
@@ -162,17 +178,21 @@ describe('getStarWarsPlanets function', () => {
       });
     });
 
-    // getPeople uses the mock implementation for fetch:
     const planet = await getStarWarsPlanets();
     expect(planet.length).toBe(2);
     expect(planet[0].name).toEqual('Tatooine');
     expect(planet[1].name).toEqual('Alderaan');
-    //expect(mocked(fetch).mock.calls.length).toBe(1);
-    //expect(person).toBeDefined();
+    expect(mocked(fetch).mock.calls).toMatchInlineSnapshot(`
+      Array [
+        Array [
+          "https://swapi.dev/api/planets",
+        ],
+      ]
+    `);
   });
 
   test('get error with the fetch', async () => {
-    mocked(fetch).mockImplementation((): Promise<any> => {
+    mocked(fetch).mockImplementationOnce((): Promise<any> => {
       return Promise.reject({
         json() {
           return Promise.reject();
