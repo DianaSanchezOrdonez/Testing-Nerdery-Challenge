@@ -73,8 +73,6 @@ const getStarWarsPlanets = async () => {
   }
 };
 
-//getStarWarsPlanets()
-
 export {
   isInteger,
   toLowerCase,
