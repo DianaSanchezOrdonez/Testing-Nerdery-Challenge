@@ -66,7 +66,7 @@ const getStarWarsPlanets = async () => {
   try {
     const response = await fetch('https://swapi.dev/api/planets');
     const body = await response.json();
-    //console.log('body', body)
+    // console.log('response', response)
     return body;
   } catch (e) {
     throw new Error('unable to make request');
@@ -74,7 +74,6 @@ const getStarWarsPlanets = async () => {
 };
 
 //getStarWarsPlanets()
-
 
 export {
   isInteger,
