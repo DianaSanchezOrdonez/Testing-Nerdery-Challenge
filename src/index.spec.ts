@@ -29,8 +29,6 @@ describe('isInteger function', () => {
     expect(isInteger('abc')).toBe(false);
     expect(isInteger(null)).toBe(false);
     expect(isInteger(undefined)).toBe(false);
-    //ERROR CASE
-    // expect(isInteger(123!)).toBe(false);
   });
 });
 
