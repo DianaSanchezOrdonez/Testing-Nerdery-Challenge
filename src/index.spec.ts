@@ -4,9 +4,17 @@ import {
   removeDuplicatesFromArray,
   createRandomProduct,
   getStarWarsPlanets,
-  createProduct,
+  createProduct
 } from './index';
 
+import fetch, { Response } from 'node-fetch';
+
+jest.mock('node-fetch')
+
+beforeEach(() => {
+  jest.clearAllMocks()
+})
+  
 test('isInteger valid', () => {
   expect(isInteger(123)).toBe(true);
   expect(isInteger(1234567890123456789012345678901234567890)).toBe(true);
@@ -48,7 +56,16 @@ test('return array without duplicates', () => {
   ]);
 });
 
-test.only('allowed to create a new product, not have the permissions', () => {
+test('disallowed to create a random product, not have the permissions', () => {
+  expect(() => createRandomProduct('diana@themyscira.com')).toThrow(
+    `You are not allowed to create products`,
+  );
+  expect(() => createRandomProduct('bruce@wayne.com')).toThrow(
+    `You are not allowed to create products`,
+  );
+});
+
+test('allowed to create a random product', () => {
   // expect(createRandomProduct('clark@kent.com')).toEqual({
   //   id: expect.any(Number),
   //   name: expect.any(String),
@@ -65,3 +82,29 @@ test.only('allowed to create a new product, not have the permissions', () => {
     tags: expect.any(Array),
   });
 });
+
+test('create a valid product', () => {
+  const product = {
+    name: 'Brown',
+    tags: ['dairy'],
+    description: 'Raw organic brown eggs',
+    price: 28.1,
+  };
+  expect(createProduct(product)).toHaveProperty('id');
+  expect(createProduct(product)).toEqual({
+    id: expect.any(Number),
+    ...product,
+  });
+});
+
+test('create an invalid product', () => {
+  const product = {
+    name: 'Brown Eggs',
+    tags: ['dairy'],
+    description: 'Raw organic brown eggs',
+    price: 28.1,
+  };
+
+  expect(() => createProduct(product)).toThrow();
+});
+

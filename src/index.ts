@@ -2,7 +2,6 @@ import faker from 'faker';
 import fetch, { Response } from 'node-fetch';
 import users from './utils/users';
 import { createProductSchema } from './utils/product.schema';
-import { log } from 'console';
 
 interface Product {
   id?: number;
@@ -67,11 +66,15 @@ const getStarWarsPlanets = async () => {
   try {
     const response = await fetch('https://swapi.dev/api/planets');
     const body = await response.json();
+    //console.log('body', body)
     return body;
   } catch (e) {
     throw new Error('unable to make request');
   }
 };
+
+//getStarWarsPlanets()
+
 
 export {
   isInteger,
@@ -79,5 +82,5 @@ export {
   removeDuplicatesFromArray,
   createRandomProduct,
   getStarWarsPlanets,
-  createProduct,
+  createProduct
 };
